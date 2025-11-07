@@ -3,12 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>EpiTicket ONE</title>
+    <title>EpiViaggi - Libri di Viaggi</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
     />
   </head>
   <body class="bg-dark min-vh-100 d-flex flex-column" data-bs-theme="dark">
@@ -21,65 +19,44 @@
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
           >
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
               <li class="nav-item">
-                <a
-                  class="nav-link active"
-                  aria-current="page"
-                  href="../Front-End/Index.html"
-                  >Home</a
-                >
+                <a class="nav-link active" href="./index.html">Home</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="./backoffice.html">Backoffice</a>
               </li>
             </ul>
-            <form class="d-flex" role="search">
-              <input
-                class="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-            </form>
           </div>
         </div>
       </nav>
       <h1 class="text-center my-3">EpiViaggi</h1>
-      <h3 class="text-center my-3">I migliori libri di Viaggi</h3>
+      <h3 class="text-center mb-4">I migliori libri di Viaggi</h3>
+      <div class="text-center mb-3">
+        <button id="adminToggle" class="btn btn-warning">
+          Modalità Amministratore
+        </button>
+      </div>
     </header>
+
     <main class="flex-grow-1">
       <div class="container">
         <div
           class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-4 g-3"
-          id="events-row"
-        >
-          <!-- qui dentro via JS andrò a creare tante colonne quanti saranno
-             gli eventi da mostrare -->
-        </div>
+          id="books-row"
+        ></div>
       </div>
     </main>
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col col-12 text-center">
-            <p>EpiViaggi - <span id="year"></span></p>
-          </div>
-        </div>
-      </div>
+
+    <footer class="text-center py-3">
+      <p>EpiViaggi - <span id="year"></span></p>
     </footer>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./scripts/index.js"></script>
   </body>
 </html>

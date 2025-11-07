@@ -1,62 +1,120 @@
-const getYearInFooter = function () {
-  const footer = document.getElementById('year')
-  footer.innerText = new Date().getFullYear() // 2025
-}
+const API_URL = "https://striveschool-api.herokuapp.com/api/product/";
+const TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTBkZTIxZWY0YmQ0NzAwMTU4NWIyYWUiLCJpYXQiOjE3NjI1MTc1MzQsImV4cCI6MTc2MzcyNzEzNH0.UkXfBihoi1e3xDp22zSbpnBXeJlc_UGECPhIaOGwICw";
 
-getYearInFooter()
+const eventsRow = document.getElementById("events-row");
+const adminBtn = document.getElementById("admin-btn");
+let adminMode = false;
 
-const eventsURL = 'https://striveschool-api.herokuapp.com/api/agenda'
+// Click amministratore: mostra/nasconde bottoni modifica/delete
+adminBtn.addEventListener("click", () => {
+  adminMode = !adminMode;
+  renderProducts(); // ricarica prodotti mostrando o nascondendo bottoni
+});
 
-// ok, è arrivato il momento di recuperare gli EVENTI dall'API di EPICODE
-// e inserirli nella pagina!
-const getEvents = function () {
-  fetch(eventsURL)
-    .then((res) => {
-      console.log('RESPONSE', res)
-      if (res.ok) {
-        // la risposta è stata 200 o simili
-        // i dati sono arrivati! :) però per estrarre un JSON da una Response
-        // devo utilizzare il metodo .json()
-        // il metodo .json() però è ASINCRONO, e TORNA UNA PROMISE
-        return res.json()
-      } else {
-        // la risposta è stata 400, 401, 404, 500 etc.
-        // c'è stato un errore!
-        // per evitare di riscrivere e ri-gestire l'errore, riutilizziamo
-        // il codice del blocco catch! teletrasportiamoci!
-        throw new Error(
-          `Errore nella risposta ricevuta dal server: ${res.status}`
-        )
+// Funzione per creare la card di un prodotto
+function createCard(product) {
+  const col = document.createElement("div");
+  col.classList.add("col");
+
+  const card = document.createElement("div");
+  card.classList.add("card", "h-100", "shadow-sm");
+  card.style.cursor = "pointer";
+
+  // immagine
+  const img = document.createElement("img");
+  img.classList.add("card-img-top");
+  img.src = product.imageUrl || "https://via.placeholder.com/250x300";
+  img.alt = product.name;
+
+  // click immagine -> details
+  img.addEventListener("click", () => {
+    localStorage.setItem("selectedProduct", JSON.stringify(product));
+    window.location.href = "details.html";
+  });
+
+  const cardBody = document.createElement("div");
+  cardBody.classList.add("card-body");
+
+  const title = document.createElement("h5");
+  title.classList.add("card-title");
+  title.innerText = product.name;
+
+  const desc = document.createElement("p");
+  desc.classList.add("card-text");
+  desc.innerText = product.description;
+
+  const price = document.createElement("p");
+  price.classList.add("card-text", "fw-bold");
+  price.innerText = `€${product.price}`;
+
+  cardBody.appendChild(title);
+  cardBody.appendChild(desc);
+  cardBody.appendChild(price);
+
+  // bottoni admin solo se adminMode
+  if (adminMode) {
+    const btnGroup = document.createElement("div");
+    btnGroup.classList.add("d-flex", "justify-content-between");
+
+    const editBtn = document.createElement("button");
+    editBtn.classList.add("btn", "btn-sm", "btn-primary");
+    editBtn.innerText = "Modifica";
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (confirm("Sicuro di voler modificare questo prodotto?")) {
+        window.location.href = `backoffice.html?id=${product._id}`;
       }
-    })
-    .then((arrayOfEvents) => {
-      // ed è qui dentro che voi avete accesso ai dati!
-      // qui dentro manipoleremo il DOM in modo da utilizzarli
-      console.log('ARRAYOFEVENTS', arrayOfEvents)
-      // adesso, per ogni evento recuperato, creiamo una colonna con dentro una card
-      // e le disponiamo nella riga events-row
-      const row = document.getElementById('events-row')
-      arrayOfEvents.forEach((book) => {
-        row.innerHTML += `
-            <div class="col">
-                <div class="card h-100 d-flex flex-column">
-                    <img src="https://www.gedistatic.it/content/gnn/img/lastampa/2024/03/08/103515446-e41635c6-62d3-43c1-8974-f0a9d7338cb4.jpg" class="card-img-top" alt="...">
-                    <div class="card-body flex-grow-1">
-                        <h5 class="card-title">${book.name}</h5>
-                        <p class="card-text">${book.description}</p>
-                        <p class="card-text">${book.brand}</p>
-                        <img class="card-text">${book.image}</img>
-                    </div>
-                    <a href="./details.html?bookID=${book._id}" class="btn btn-primary">Vai ai dettagli</a>
-                </div>
-            </div>
-        `
-      })
-    })
-    .catch((err) => {
-      console.log('PROBLEMA', err)
-      // problemi di connessione, spina staccata etc.
-    })
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("btn", "btn-sm", "btn-danger");
+    deleteBtn.innerText = "Elimina";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (confirm("Sicuro di voler eliminare questo prodotto?")) {
+        fetch(`${API_URL}${product._id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Errore eliminazione prodotto");
+            renderProducts();
+          })
+          .catch((err) => alert(err));
+      }
+    });
+
+    btnGroup.appendChild(editBtn);
+    btnGroup.appendChild(deleteBtn);
+    cardBody.appendChild(btnGroup);
+  }
+
+  card.appendChild(img);
+  card.appendChild(cardBody);
+  col.appendChild(card);
+
+  return col;
 }
 
-getEvents()
+// Recupera prodotti dal server
+function renderProducts() {
+  eventsRow.innerHTML = ""; // reset
+  fetch(API_URL, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  })
+    .then((res) => res.json())
+    .then((products) => {
+      if (!products.length) {
+        eventsRow.innerHTML = "<p class='text-center'>Nessun prodotto disponibile</p>";
+        return;
+      }
+      products.forEach((prod) => {
+        const card = createCard(prod);
+        eventsRow.appendChild(card);
+      });
+    })
+    .catch((err) => console.error(err));
+}
+
+// inizializza pagina
+renderProducts();
